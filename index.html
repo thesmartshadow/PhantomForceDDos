@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>المحاكاة السيبرانية المتطورة</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* نظام التصميم المُحسَّن */
+        :root {
+            --primary-color: #00ff88;
+            --secondary-color: #0a192f;
+        }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: var(--secondary-color);
+            color: var(--primary-color);
+            font-family: 'Courier New', monospace;
+        }
+
+        #dashboard {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(10, 25, 47, 0.95);
+            padding: 20px;
+            border: 2px solid var(--primary-color);
+            border-radius: 15px;
+            width: 320px;
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+        }
+
+        .control-group {
+            margin: 15px 0;
+            padding: 15px;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 8px;
+        }
+
+        button {
+            background: linear-gradient(45deg, #00ff88, #00ccff);
+            border: none;
+            color: var(--secondary-color);
+            padding: 12px 24px;
+            margin: 10px 0;
+            cursor: pointer;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            width: 100%;
+            text-shadow: 0 0 5px rgba(0, 255, 136, 0.5);
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+        }
+
+        progress {
+            width: 100%;
+            height: 10px;
+            border-radius: 5px;
+            background: #12243d;
+        }
+
+        progress::-webkit-progress-bar {
+            background: #12243d;
+            border-radius: 5px;
+        }
+
+        progress::-webkit-progress-value {
+            background: linear-gradient(45deg, #00ff88, #00ccff);
+            border-radius: 5px;
+        }
+
+        #statsCanvas {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(10, 25, 47, 0.9);
+            border: 2px solid var(--primary-color);
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
+        }
+    </style>
+</head>
+<body>
+    <div id="dashboard">
+        <h2 style="text-align: center; margin: 0 0 20px 0;">🚀 مركز القيادة السيبراني</h2>
+        <div class="control-group">
+            <button onclick="toggleAttack()" id="attackBtn">⚡ بدء الهجوم الكمومي</button>
+        </div>
+        <div class="control-group">
+            <label>🔥 جدار الحماية</label>
+            <progress id="firewall" value="100" max="100"></progress>
+            <label>🛡️ شبكة التشفير</label>
+            <progress id="encryption" value="100" max="100"></progress>
+            <label>🕵️ نظام كشف التسلل</label>
+            <progress id="ids" value="100" max="100"></progress>
+        </div>
+    </div>
+    <canvas id="statsCanvas" width="400" height="200"></canvas>
+
+<script>
+// نظام المُتغيرات المُحسَّن
+let globe, attackers = [], isQuantumAttack = false, cryptoMatrix = [];
+const MAX_ATTACKERS = 666, GLOBE_RADIUS = 300;
+let statsChart, canvas;
+
+class CyberGlobe {
+    constructor() {
+        this.rotation = 0;
+        this.layers = [
+            {name: 'firewall', strength: 100, color: [255, 80, 80]},
+            {name: 'encryption', strength: 100, color: [80, 255, 80]},
+            {name: 'ids', strength: 100, color: [80, 80, 255]}
+        ];
+    }
+
+    rotateGlobe() {
+        this.rotation += 0.002;
+    }
+
+    draw() {
+        push();
+        translate(width/2, height/2);
+        rotateX(frameCount * 0.01);
+        rotateY(this.rotation);
+        
+        // نظام الإضاءة المُحسَّن
+        pointLight(0, 255, 136, 0, 0, 1000);
+        ambientLight(30);
+        specularMaterial(200);
+        shininess(100);
+
+        // الرسم ثلاثي الأبعاد المُحسَّن
+        this.drawCore();
+        this.drawDefenseLayers();
+        pop();
+    }
+
+    drawCore() {
+        fill(0, 255, 136, 100);
+        stroke(0, 150, 0);
+        strokeWeight(3);
+        sphere(GLOBE_RADIUS * 0.3);
+    }
+
+    drawDefenseLayers() {
+        this.layers.forEach((layer, i) => {
+            push();
+            rotateZ(frameCount * 0.02 * (i+1));
+            fill(...layer.color, 30);
+            stroke(...layer.color);
+            strokeWeight(map(layer.strength, 0, 100, 1, 5));
+            sphere(GLOBE_RADIUS * (0.4 + i*0.2));
+            pop();
+        });
+    }
+}
+
+class QuantumAttacker {
+    constructor() {
+        this.pos = p5.Vector.random3D().mult(random(GLOBE_RADIUS * 3, GLOBE_RADIUS * 4));
+        this.vel = p5.Vector.sub(createVector(), this.pos).normalize().mult(random(3, 7));
+        this.size = random(5, 10);
+        this.type = this.randomAttackType();
+    }
+
+    randomAttackType() {
+        const types = ['malware', 'phishing', 'zero-day'];
+        return types[floor(random(types.length))];
+    }
+
+    update() {
+        this.pos.add(this.vel);
+        this.checkCollision();
+    }
+
+    checkCollision() {
+        if (this.pos.mag() < GLOBE_RADIUS * 1.2) {
+            this.attackLayer();
+            this.respawn();
+        }
+    }
+
+    attackLayer() {
+        const layerIndex = floor(random(3));
+        const damage = random(0.1, 0.5);
+        globe.layers[layerIndex].strength = max(globe.layers[layerIndex].strength - damage, 0);
+        updateLayerDisplay();
+    }
+
+    respawn() {
+        this.pos = p5.Vector.random3D().mult(random(GLOBE_RADIUS * 3, GLOBE_RADIUS * 4));
+    }
+
+    show() {
+        push();
+        translate(width/2, height/2);
+        noStroke();
+        fill(255, 0, 0);
+        translate(this.pos.x, this.pos.y, this.pos.z);
+        sphere(this.size/2);
+        pop();
+    }
+}
+
+function setup() {
+    canvas = createCanvas(windowWidth, windowHeight, WEBGL);
+    canvas.elt.style.position = 'fixed';
+    canvas.elt.style.zIndex = 0;
+    globe = new CyberGlobe();
+    initializeCryptoMatrix();
+    setupStatsChart();
+    setupEventListeners();
+    textFont('Courier New');
+}
+
+function draw() {
+    background(0);
+    handleOrbitControl();
+    globe.rotateGlobe();
+    globe.draw();
+    
+    if (isQuantumAttack) {
+        launchQuantumAttack();
+        handleDefenseMechanisms();
+    }
+    
+    attackers.forEach(attacker => {
+        attacker.update();
+        attacker.show();
+    });
+    
+    drawCryptoMatrix();
+    updateChart();
+}
+
+function handleOrbitControl() {
+    if (!isMouseOverDashboard()) {
+        orbitControl(1, 1, 0.1);
+    }
+}
+
+function isMouseOverDashboard() {
+    const rect = document.getElementById('dashboard').getBoundingClientRect();
+    return mouseX >= rect.left && mouseX <= rect.right &&
+           mouseY >= rect.top && mouseY <= rect.bottom;
+}
+
+function initializeCryptoMatrix() {
+    cryptoMatrix = Array.from({length: 100}, () => floor(random(2)));
+}
+
+function drawCryptoMatrix() {
+    push();
+    fill(0, 255, 136);
+    textSize(14);
+    textAlign(LEFT, TOP);
+    for (let i = 0; i < 100; i++) {
+        const x = -width/2 + 20 + (i % 10) * 25;
+        const y = -height/2 + 20 + floor(i / 10) * 25;
+        text(cryptoMatrix[i], x, y);
+    }
+    pop();
+}
+
+function launchQuantumAttack() {
+    if (attackers.length < MAX_ATTACKERS) {
+        attackers.push(new QuantumAttacker());
+    }
+    mutateCryptoMatrix();
+}
+
+function mutateCryptoMatrix() {
+    for (let i = 0; i < 3; i++) {
+        const index = floor(random(cryptoMatrix.length));
+        cryptoMatrix[index] = 1 - cryptoMatrix[index];
+    }
+}
+
+function handleDefenseMechanisms() {
+    globe.layers.forEach(layer => {
+        layer.strength = min(layer.strength + 0.05, 100);
+    });
+}
+
+function updateLayerDisplay() {
+    globe.layers.forEach(layer => {
+        document.getElementById(layer.name).value = layer.strength;
+    });
+}
+
+function toggleAttack() {
+    isQuantumAttack = !isQuantumAttack;
+    document.getElementById('attackBtn').textContent = 
+        isQuantumAttack ? '🛑 إيقاف الهجوم' : '⚡ بدء الهجوم';
+}
+
+function setupStatsChart() {
+    statsChart = new Chart(document.getElementById('statsCanvas').getContext('2d'), {
+        type: 'radar',
+        data: {
+            labels: ['التهديدات', 'التشفير', 'الاستجابة', 'السعة', 'الحزم'],
+            datasets: [{
+                data: [0, 100, 100, 0, 100],
+                backgroundColor: 'rgba(0, 255, 136, 0.2)',
+                borderColor: '#00ff88',
+                pointRadius: 4
+            }]
+        },
+        options: {
+            responsive: false,
+            scales: {
+                r: {
+                    angleLines: {color: '#00ff88'},
+                    grid: {color: '#00ff88'},
+                    pointLabels: {color: '#00ff88', font: {size: 12}},
+                    ticks: {display: false},
+                    min: 0,
+                    max: 100
+                }
+            },
+            plugins: {
+                legend: {display: false},
+                tooltip: {enabled: false}
+            }
+        }
+    });
+}
+
+function updateChart() {
+    if (statsChart) {
+        statsChart.data.datasets[0].data = [
+            attackers.length,
+            globe.layers[1].strength,
+            100 - (attackers.length/MAX_ATTACKERS)*100,
+            globe.layers[0].strength,
+            attackers.length * 10
+        ];
+        statsChart.update();
+    }
+}
+
+function setupEventListeners() {
+    window.addEventListener('resize', () => {
+        resizeCanvas(windowWidth, windowHeight);
+        canvas.elt.style.width = '100%';
+        canvas.elt.style.height = '100%';
+    });
+}
+</script>
+</body>
+</html>
